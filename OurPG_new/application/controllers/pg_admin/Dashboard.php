@@ -13,20 +13,24 @@ class Dashboard extends CI_Controller {
         }
 	public function index()
 	{
+            $data = array();
             // check  for session  is available
             $user_id = $this->session->userdata('user_id');
+            $role_id = $this->session->userdata('role_id'); 
             if(!isset($user_id)):
                 redirect('registration/pglogin');
                return TRUE; 
             endif;
-            // check if user have company details
-            $company_dtl = $this->pgadmin->select_info('pg_company',array('user_id'=>$user_id));
-            if($company_dtl == FALSE):
-                $this->load->view('pg_admin/company_profile_first_visit');
-                return TRUE;
-            else:
-                $this->load->view('pg_admin/dashboard');
-            endif;
+            
+            
+                // check if PG ADMIN have company details
+                $company_dtl = $this->pgadmin->select_info('pg_company',array('user_id'=>$user_id));
+                if($company_dtl == FALSE && $role_id == ROLE_PG_ADMIN):
+                    $this->load->view('pg_admin/company_profile_first_visit',$data);
+                    return TRUE;
+                else:
+                    $this->load->view('pg_admin/dashboard',$data);
+                endif;
             
             
             
@@ -169,6 +173,27 @@ class Dashboard extends CI_Controller {
                 $data['secured_data'] = array(
                                             'company_id'=>$this->encrypt->encode($company_dtl[0]['company_id'], VERI_KEY)                                            
                                             );
+		// State & city
+		$path = 'state_city/cities.json';
+		if(file_exists($path)):
+	           $json_file = file_get_contents($path);
+		   // convert the string to a json object
+                   //Decode JSON
+			$json_data = json_decode($json_file,true);
+			
+			$tmp = array();
+			foreach($json_data as $jsondata)
+			{
+			    $tmp[$jsondata['state']][] = $jsondata['name'];
+			}
+			foreach($tmp as $type => $labels)
+			{
+			    $output[] = $type;
+			}
+			
+			$data['state'] = $output;
+		endif;
+		
                 
                 $this->load->view('pg_admin/company_profile',$data);
             else :
@@ -176,6 +201,9 @@ class Dashboard extends CI_Controller {
                 return TRUE;   
             endif;
         }
+	public function CityListBystate(){
+		echo '<option value="a">Item A</option>';
+	}
     public function saveCompanyLogo() {
 		$user_id = $this->session->userdata('user_id');
 		$flag = "update";
@@ -206,9 +234,7 @@ class Dashboard extends CI_Controller {
 		$output = shell_exec($command);
 		
 		if (empty($output)){
-		$message .='<div class="alert alert-success">
-											<strong>Success!</strong> Profile image updated sucessfully.
-										  </div>';  
+		$message .='<div class="alert alert-success"><strong>Success!</strong> Profile image updated sucessfully.</div>';  
 			if($flag == "update"){
 			   $this->pgadmin->update_info("pg_company",array('company_logo'=>$img_name),array("company_id"=>$company_id)); 
 			} else{

@@ -70,13 +70,13 @@ class Registration extends CI_Controller {
                     'mobile_no'=>$mobile_no
                 );
                 $this->login->insert_info('user_profile',$data_user_profile);
+		$fullname = $first_name.' '.$last_name;
                 // send verification email 
-                $this->sendverificationEmail($pg_contact_email,$user_id,$ver_code);
+                $this->sendverificationEmail($pg_contact_email,$user_id,$ver_code,$fullname);
+		$this->sendEmailToAdmin($fullname,$mobile_no,$pg_contact_email);
                 $data['userinfo'] = array('name'=>$first_name,'email'=>$pg_contact_email);
-                $this->load->view('site/varificationlinksent',$data);
-                
-                endif;
-                
+                $this->load->view('site/varificationlinksent',$data);                
+                endif;                
                 else :                  
                 $this->load->view('site/registration'); 
             endif;
@@ -154,40 +154,40 @@ class Registration extends CI_Controller {
             $userid = $param['userid'];
             $code = $param['code'];            
             if($this->login->update_info('user_info',array('status'=>2,'emailver_code'=>'0'),array('id'=>$userid,'emailver_code'=>$code))) :
-               echo 'Your account is verified'; 
+               echo 'Your account is verified';
+	       redirect('registration/pglogin');
             else:
                echo 'OOPS Link  Expired';  
             endif;
          
         }
-        public function sendverificationEmail($email_to,$user_id,$code) {
+        public function sendverificationEmail($email_to,$user_id,$code,$name) {
             // load encryption library
             
-            $msg= "userid=".$user_id."&code=".$code;
-            
+            $msg= "userid=".$user_id."&code=".$code;            
             $encrypted_string = $this->encrypt->encode($msg, VERI_KEY);
             
             $verlink = base_url()."registration/emailVerification?rand=".$encrypted_string;
             
-			$this->load->library('email');
-			$config['mailtype'] = 'html';
-			$config['smtp_port']=EMAIL_PORT;
-			$config['smtp_timeout'] = 5;
-			$config['charset']='utf-8'; // Default should be utf-8 (this should be a text field) 
-			$config['newline']="\r\n"; //"\r\n" or "\n" or "\r". DEFAULT should be "\r\n" 
-			$config['crlf'] = "\r\n"; //"\r\n" or "\n" or "\r" DEFAULT should be "\r\n" 
+		$this->load->library('email');
+		$config['mailtype'] = 'html';
+		$config['smtp_port']=EMAIL_PORT;
+		$config['smtp_timeout'] = 5;
+		$config['charset']='utf-8'; // Default should be utf-8 (this should be a text field) 
+		$config['newline']="\r\n"; //"\r\n" or "\n" or "\r". DEFAULT should be "\r\n" 
+		$config['crlf'] = "\r\n"; //"\r\n" or "\n" or "\r" DEFAULT should be "\r\n" 
 
-			$config['charset']='utf-8';
-			$config['protocol'] = 'smtp';
-			$config['smtp_crypto'] = 'tls';
+		$config['charset']='utf-8';
+		$config['protocol'] = 'smtp';
+		$config['smtp_crypto'] = 'tls';
 
-			$config['smtp_host'] = EMAIL_SMTP_HOST;
-			$config['smtp_user'] = EMAIL_FROM;
-			$config['smtp_pass'] = EMAIL_PWD;
+		$config['smtp_host'] = EMAIL_SMTP_HOST;
+		$config['smtp_user'] = EMAIL_FROM;
+		$config['smtp_pass'] = EMAIL_PWD;
 
 
-			$config['charset'] = 'iso-8859-1';
-			$config['wordwrap'] = TRUE;
+		$config['charset'] = 'iso-8859-1';
+		$config['wordwrap'] = TRUE;
 
             $this->email->initialize($config);
             $path = 'JSON_DATA/email/1001.json';
@@ -197,16 +197,13 @@ class Registration extends CI_Controller {
                 // convert the string to a json object
                 $jfo = json_decode($json_file);
                 
-                $msg = str_replace(array("XXXXXX6","baseimageurl","#"), array("pvningalkar@gmail.com",  asset_url(),$verlink), $jfo->template->body_en); //  msg creation
+                $msg = str_replace(array("[UERNAME]","[BASEIMAGEURL]","[VERIFYLINK]"), array($name,asset_url(),$verlink), $jfo->template->body_en); //  msg creation
 				  
 				  
-			  	$this->email->from(EMAIL_FROM, EMAIL_FROM_NAME);
+		$this->email->from(EMAIL_FROM, EMAIL_FROM_NAME);
                 $this->email->to($email_to);
-                $this->email->subject($jfo->template->subject_en); 
-				  
+                $this->email->subject($jfo->template->subject_en); 				  
 			  	$this->email->message($msg);
-                
-			
 				$this->email->set_newline("\r\n");
                 if (!$this->email->send()) {
                   show_error($this->email->print_debugger()); }
@@ -216,6 +213,55 @@ class Registration extends CI_Controller {
               }
                 
         }
+       
+        public function sendEmailToAdmin($fullname,$mobile_no,$pg_contact_email) {
+            // load encryption library            
+		$this->load->library('email');
+		$config['mailtype'] = 'html';
+		$config['smtp_port']=EMAIL_PORT;
+		$config['smtp_timeout'] = 5;
+		$config['charset']='utf-8'; // Default should be utf-8 (this should be a text field) 
+		$config['newline']="\r\n"; //"\r\n" or "\n" or "\r". DEFAULT should be "\r\n" 
+		$config['crlf'] = "\r\n"; //"\r\n" or "\n" or "\r" DEFAULT should be "\r\n" 
+
+		$config['charset']='utf-8';
+		$config['protocol'] = 'smtp';
+		$config['smtp_crypto'] = 'tls';
+
+		$config['smtp_host'] = EMAIL_SMTP_HOST;
+		$config['smtp_user'] = EMAIL_FROM;
+		$config['smtp_pass'] = EMAIL_PWD;
+
+
+		$config['charset'] = 'iso-8859-1';
+		$config['wordwrap'] = TRUE;
+
+            $this->email->initialize($config);
+            $path = 'JSON_DATA/email/1004.json';
+			if(file_exists($path))
+              {
+                 $json_file = file_get_contents($path);
+                // convert the string to a json object
+                $jfo = json_decode($json_file);
+                
+                $msg = str_replace(array("[PGOWNERNAME]","[EMAIL]","[PHONE]"), array($fullname,$pg_contact_email,$mobile_no), $jfo->template->body_en); //  msg creation
+				  
+				  
+		$this->email->from(EMAIL_FROM, EMAIL_FROM_NAME);
+                $this->email->to('chetak.al@cyberpact.in,vallabha.desai@cyberpact.in');
+		//$this->email->cc('email1@test.com,email2@test.com,email3@test.com');
+                $this->email->subject($jfo->template->subject_en); 				  
+			  	$this->email->message($msg);
+				$this->email->set_newline("\r\n");
+                if (!$this->email->send()) {
+                  show_error($this->email->print_debugger()); }
+                else {
+//                  echo 'Your e-mail has been sent!';
+                }
+              }
+                
+        }
+       
         public function testemail() {
             // load encryption library
           

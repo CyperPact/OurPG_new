@@ -71,10 +71,8 @@
                                                         <th width="20%">Mobile No</th>
                                                         <th width="20%">Joining Date</th>
                                                     </tr>
-                                                </thead>
-                                                
+                                                </thead>                                                
                                                 <tbody class="expense_table_body expense_table_monthly">
-
                                                 </tbody>
                                             </table>   
                                             <div class='row'>
@@ -105,15 +103,12 @@
                                                 <b>Add guest complete details.</b>
                                             </h2>
                                         </div>
-                                        <div class="md-card-content">
-                                               
-                                                                        
+                                        <div class="md-card-content">  
                                         </div>
                                     </div>
                                 </li>
                             </ul>
                         </div>
-                
             </div>
             
         </div>
@@ -154,6 +149,7 @@ $(document).on('change','#check_all',function(){
 
 // send Invitation
 $("#sendinvetation").submit(function(e) {
+               
             e.preventDefault();
             jQuery.ajax({
                         type: "POST",
@@ -162,8 +158,7 @@ $("#sendinvetation").submit(function(e) {
                         success: function(data) {
                             var data = JSON.parse(data);
                             alert(data.status);
-                            
-                            
+                            $("#sendinvetation").trigger('reset');
                          }
                         });
                 });

@@ -170,60 +170,52 @@
             <div class="uk-form-row">
                 <div class="uk-grid">
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>First Name <span class="req">*</span></label><input name="emp_fname" type="text" class="md-input emp_fname" required/><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>First Name <span class="req">*</span></label><input name="emp_fname" id="emp_fname" value="" type="text" class="md-input emp_fname" /><span class="md-input-bar"></span></div>
                     </div>
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Last Name</label><input type="text" name="emp_lname" class="md-input emp_lname" required/><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Last Name</label><input type="text" name="emp_lname" id="emp_lname" value=""  class="md-input emp_lname" required/><span class="md-input-bar"></span></div>
                     </div>
                 </div>
             </div>
             <div class="uk-form-row">
                 <div class="uk-grid">
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Mobile Number <span class="req">*</span></label><input type="text" name="emp_mobile" class="md-input emp_mobile" ondrop="return false;" onpaste="return false;"  required/><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Mobile Number <span class="req">*</span></label><input type="text" name="emp_mobile" id="emp_mobile" class="md-input emp_mobile" ondrop="return false;" onpaste="return false;"  required/><span class="md-input-bar"></span></div>
                     </div>
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Email Id <span class="req">*</span></label><input type="email" name="emp_email" class="md-input emp_email" required/><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Email Id <span class="req">*</span></label><input type="email" name="emp_email" id="emp_email" class="md-input emp_email" readonly="readonly"/><span class="md-input-bar"></span></div>
                     </div>
                 </div>
             </div>
             <div class="uk-form-row">
                 <div class="uk-grid">
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Permanent Address<span class="req">*</span></label><textarea type="text" name="emp_permanent_add" class="md-input emp_permanent_add"></textarea><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Permanent Address<span class="req">*</span></label><textarea type="text" name="emp_permanent_add" id="emp_permanent_add" class="md-input emp_permanent_add"></textarea><span class="md-input-bar"></span></div>
                     </div>
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Present Address <span class="req">*</span></label><textarea type="text" name="emp_present_add" class="md-input emp_present_add"></textarea><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Present Address <span class="req">*</span></label><textarea type="text" name="emp_present_add" id="emp_present_add" class="md-input emp_present_add"></textarea><span class="md-input-bar"></span></div>
                     </div>
                 </div>
             </div>
             <div class="uk-form-row">
                 <div class="uk-grid">
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Emergency Contact Number<span class="req">*</span></label><input type="text" name="emp_emg_no" class="md-input emp_emg_no" ondrop="return false;" onpaste="return false;" required/><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Emergency Contact Number<span class="req">*</span></label><input type="text" name="emp_emg_no" id="emp_emg_no" class="md-input emp_emg_no" ondrop="return false;" onpaste="return false;" required/><span class="md-input-bar"></span></div>
                     </div>
                     <div class="uk-width-medium-1-2">
-                        <div class="md-input-wrapper"><label>Aadhar Number<span class="req">*</span></label><input type="text" name="emp_aadhar_number" class="md-input emp_aadhar_number" required/><span class="md-input-bar"></span></div>
+                        <div class="md-input-wrapper"><label>Aadhar Number<span class="req">*</span></label><input type="text" name="emp_aadhar_number" id="emp_aadhar_number" class="md-input emp_aadhar_number" required/><span class="md-input-bar"></span></div>
                     </div>
                 </div>
             </div>
-            <div class="uk-form-row">
-                <div class="uk-grid">
-                    <div class="uk-width-medium-1-1">
-                        <label>Employee Role                             
-                            <label><input class="uk-radio" type="radio" name="role" value="3" checked> Manager</label>
-                            <label><input class="uk-radio" type="radio" name="role" value="4" > Caretaker</label>
-                        </label>                            
-                    </div>
-                    
-                </div>
-            </div>
+            
             <?php echo '<input  type="hidden" value="'.$company_id.'" name="company_id" />'; ?>
             
             <div style="width:100%; text-align:center;    margin-top: 15px;">
                 <button type="submit" class="add_emp_save md-btn md-btn-success md-btn-wave-light waves-effect waves-button waves-light" style="width:100px;">Save</button>
             </div>
-             </div></form>           
+             </div>
+				 <input type="hidden" name="emp_id" id="emp_id" value="">
+				</form>           
                 
 </div>
             <!-- employee adder model /-->
@@ -308,11 +300,24 @@ function toggleBounce() {
                         url: "<?php echo base_url().'pg_admin/MyPG/editemployeedetail' ?>",    
                         data: {'id':emp_id},
                         success: function(data) {
-									 console.log(data);
+									 var data = JSON.parse(data);
+									if(data.status == "success"){
+										var emp_details = data.data;
+										$("#emp_id").val(emp_details[0].emp_id);
+										$("#emp_fname").val(emp_details[0].emp_fname);
+										$("#emp_lname").val(emp_details[0].emp_lname);
+										$("#emp_mobile").val(emp_details[0].emp_mobile);
+										$("#emp_email").val(emp_details[0].emp_email);
+										$("#emp_permanent_add").val(emp_details[0].emp_permanent_add);
+										$("#emp_present_add").val(emp_details[0].emp_present_add);
+										$("#emp_emg_no").val(emp_details[0].emp_emg_no);
+										$("#emp_aadhar_number").val(emp_details[0].emp_aadhar_number)
+										var modal = UIkit.modal("#employeeadder");
+										modal.show();
+									}
                          }
                         });
-						 var modal = UIkit.modal("#employeeadder");
-							modal.show();
+						
 					 });
                 
                 $("#addemployeedetails").submit(function(e) {
@@ -324,23 +329,8 @@ function toggleBounce() {
                         data: $(this).serialize(),
                         success: function(data) {
                             var data = JSON.parse(data);
-                            alert(data.status);
-                            
-                            if(data.status == "success")
-                            {                                   
-                              $('.alert_msg').html(data.msg);
-                              UIkit.modal('#employeeadder').hide();
-                              var html ="";
-                              for (var i = 0; i < data.emp_data.length; i++) {                                    
-                                    html +='<tr><td>'+data.emp_data[i].company_employee_id+'</td>';
-                                    html +='<td><label>'+data.emp_data[i].emp_fname+' '+data.emp_data[i].emp_lname+'</label></td>';
-                                    html +='<td><input class="uk-checkbox" value="'+data.emp_data[i].emp_id+'" name="addpgemployee[]" type="checkbox" ></td></tr>';
-                                }
-                              $('#showemp').html(html);
-                            } else if(data.status == "confuse")
-                            {
-                                UIkit.modal.alert(data.msg);
-                            }
+                            alert(data.status);                            
+                            location.reload();
                          }
                         });
                       });
@@ -405,7 +395,8 @@ function toggleBounce() {
 									$('.errors').html('<div class="alert alert-danger" role="alert">'+data.msg+'</div>');
 								} else
 								{
-									 UIkit.modal.alert(data.msg);									
+									UIkit.modal.alert(data.msg);
+									
 								}
 							}
 							});	

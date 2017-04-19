@@ -57,13 +57,15 @@ a{text-decoration:none;}
 @import "bourbon";
 
 body {
-	background: #eee !important;	
+	background: #fff !important;	
 }
 
 
 /*Login*/
-.wrapper {margin-top: 80px; margin-bottom: 80px;}
-.form-signin { max-width: 485px; padding: 15px 0px 45px; margin: 0 auto; background-color: #fff; border: 5px solid #36424c; text-align: center; font-family:'Lato-Bold';  color: #174db7 !important;}
+.container { width:1225px;}
+.top_logo {padding: 10px 0 0 0;}
+.wrapper {margin-top: 60px; margin-bottom:60px;}
+.form-signin { max-width: 485px; padding: 15px 0px 30px; margin: 0 auto; background-color: #fff; text-align: center; font-family:'Lato-Bold';  color: #174db7 !important;}
 .form-signin-heading, .checkbox {margin-bottom: 30px; font-size: 26px !important;}
 .checkbox {font-weight: normal;}
 .form-control {position: relative; font-size: 16px; height: auto; padding: 10px; @include box-sizing(border-box);
@@ -76,6 +78,12 @@ input[type="password"] {margin-bottom: 20px;}}
 .newinput { width: 72%; margin: 0 auto;  }
 .center_line {font-family:'Lato-Regular'; font-size: 16px; margin: 25px 0 25px 0; color: #0a4a81;}
 .btm_line {font-family:'Lato-Regular'; font-size: 13px; margin: 25px 0 25px 0; color: #0a4a81;}
+
+.midcontfooter p { float: left; padding:0 22px 0 0;}
+.midcontfooter a { padding:0 10px 0 0;}
+.ritflt a { float:right;}
+
+
 .form_footer { color: #0a4a81; font-family:'Lato-Regular'; font-size: 12px; }
 .form_footer a {color: #0a4a81;}
 .form_footer a:hover {color: #000; text-decoration: none;}

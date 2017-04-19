@@ -8,47 +8,54 @@
 		<link href="<?php echo asset_url('css/font-awesome.css'); ?>" rel="stylesheet">
 		<link href="<?php echo asset_url('css/main.css'); ?>" rel="stylesheet">
 		<link href="<?php echo asset_url('css/jquery.loading-indicator.css'); ?>" rel="stylesheet">
+		
 	</head>
 
         <body style="overflow: hidden;">
 		
-		<div class="container">
-
+			<div class="container">
+		 <div class="top_logo">
+			<img src="<?php echo asset_url('images/logo.jpg'); ?>">
+		  </div>
+		
+		
 		<!--Login-->
-			<div class="wrapper ajax_response_result">
-                            <form class="form-signin" id="login" name="login">
+			<div class="wrapper">
+			    <form class="form-signin" id="login" name="login" method="post">
 			    	<div class="top_head"><p>Indias first SAAS based</p></div>		       
 			      <h2 class="form-signin-heading newhead">Paying Guest Management System</h2>
-
+					<p><?php
+					if(isset($_SESSION['flash'])):
+						echo $_SESSION['flash'];
+						unset($_SESSION['flash']); //flash is one time only
+					endif;
+					?>
 			      <div class="newinput">
 			      	<input type="text" class="form-control" name="username" placeholder="User ID" required="" autofocus="" />
                                 <div id="usernameerror" class="errorMessage"></div>
-			      	<input type="password" class="form-control" name="password" placeholder="Password" required=""/>  
-                                <div id="passerror" class="errorMessage"></div>
+			      	<input type="password" class="form-control" name="password" placeholder="Password" required="" autocomplete="off" />  
+                                <div id="passerror" class="errorMessage"></div>     
 			      </div>
-                              <div id="credentialerror" class="errorMessage"></div>
-			      <button class="btn btn-lg btn-primary btn-block nwbtn" type="button" id="click_form"  >Login</button> 
+					<div id="credentialerror" class="errorMessage"></div>
+			       <button class="btn btn-lg btn-primary btn-block nwbtn" type="button" id="click_form"  >Login</button> 
 
 			      <div class="center_line">
 			      	<p>Empower your business never before.</p> 
 			      </div>
-
-			      <div class="middle-logo">
-			      	<img src="<?php echo asset_url('images/logo.jpg'); ?>">
-			      </div>
-
-			       <div class="btm_line">
-			      	<p>2017 CyberPact solutions</p> 
-			      </div>
-
-			      <div class="form_footer">
-			    	<div class="col-md-6">Veraion 1.0.10</div>
-			    	<div class="col-md-6"><a href="#">www.cyberpact.in</a></div>
-			    </div>
-			    </form>
+				</form>
 			</div>
 		<!--Login-End-->	
-
+		
+		 		 <div class="form_footer">
+			    	<div class="col-md-4">Veraion 1.0.10</div>
+					<div class="col-md-4 midcontfooter">
+						<p>2017 CyberPact solutions</p>
+						<a href="#">User Agreement</a>
+						<a href="#">Privacy Policy</a>
+					</div> 
+			    	<div class="col-md-4 ritflt"><a href="#">www.cyberpact.in</a></div>
+			    </div>
+		
 		</div>
 
 		<script src="<?php echo asset_url('js/jquery.min.js'); ?>"></script>  

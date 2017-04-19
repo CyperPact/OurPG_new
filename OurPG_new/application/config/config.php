@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://qa.ourpg.co/dev/';
+$config['base_url'] = 'http://124.153.104.69:8051/';
 
 /*
 |--------------------------------------------------------------------------

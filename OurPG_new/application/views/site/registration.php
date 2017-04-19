@@ -136,11 +136,11 @@ body {
                                         </div>	
 					<div class="form-group">
 						<label>Password</label>
-                                                <input name="password" type="text" placeholder="Enter Password" class="form-control" required=""  id="password" />
+                                                <input name="password" type="password" placeholder="Enter Password" class="form-control" required=""  id="password" />
 					</div>	
 					<div class="form-group">
 						<label>Conform Password</label>
-						<input name="conform_password"  type="text" placeholder="Conform Your Password Here.." class="form-control" required="" id="confirm_password"  />
+						<input name="conform_password"  type="password" placeholder="Conform Your Password Here.." class="form-control" required="" id="confirm_password"  />
                                                 <div class="errorMessage"><?php echo form_error('password'); ?></div>
 					</div>	
 					

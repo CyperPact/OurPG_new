@@ -223,52 +223,20 @@
         <div class="menu_section">
             <ul>
                 <li id="dashboard_menu"  title="Dashboard">
-                    <a href="<?php echo base_url()."pg_admin/dashboard/" ?>">
+                    <a href="<?php echo base_url()."pg_guest/dashboard/" ?>">
                         <span class="menu_icon"><i class="material-icons">&#xE871;</i></span>
                         <span class="menu_title">Dashboard</span>
                     </a>
                     
                 </li>    
-				<?php if($this->session->userdata('role_id') == ROLE_PG_ADMIN) { ?>
-                <li id="mcprofile" title="Company Profile">
-                    <a href="<?php echo base_url()."pg_admin/dashboard/companyprofile" ?>">
-                        <span class="menu_icon"><i class="material-icons">&#xE87C;</i></span>
-                        <span class="menu_title">Company Profile</span>
+                <li id="docs"  title="Document">
+                    <a href="<?php echo base_url()."pg_guest/dashboard/document/" ?>">
+                        <span class="menu_icon"><i class="material-icons">&#xE871;</i></span>
+                        <span class="menu_title">Document</span>
                     </a>
                     
-                </li>
-				<?php } ?>
-				<?php if($this->session->userdata('role_id') == ROLE_PG_ADMIN) { ?>
-				 <li id="listmypg" title="My PG">
-                    <a href="<?php echo base_url()."pg_admin/MyPG/details" ?>">
-                        <span class="menu_icon"><i class="material-icons">&#xE8B8;</i></span>
-                        <span class="menu_title">PG Branch</span>
-                    </a>
-                </li> 
-				<?php } ?>
-                <li id="addguest" title="My Guest">
-                    <a href="<?php echo base_url()."pg_admin/MyGuest/addGuest" ?>">
-                        <span class="menu_icon"><i class="material-icons">&#xE7FE;</i></span>
-                        <span class="menu_title">Guest</span>
-                    </a>
-                </li>
-				<li id="pgemployee" title="PG Employee">
-                    <a href="<?php echo base_url()."pg_admin/MyEmployee" ?>">
-                        <span class="menu_icon"><i class="material-icons">&#xE7FE;</i></span>
-                        <span class="menu_title">Employee</span>
-                    </a>
-                </li>
-				 <li title="Configuration">
-                    <a href="#">
-                        <span class="menu_icon"><i class="material-icons">&#xE0B9;</i></span>
-                        <span class="menu_title">Configuration</span>
-                    </a>
-                    <ul>
-                        <li><a href="#">System Configuration</a></li>
-                        <li><a href="<?php echo base_url()."pg_admin/EmailGeneration/emailtemplate" ?>">Email Templates</a></li>
-                    </ul>
-                
-                </li>
+                </li>    
+				
              </ul>
         </div>
     </aside><!-- main sidebar end -->

@@ -1,87 +1,43 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+$base_url = load_class('Config')->config['base_url'];
 ?><!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>Database Error</title>
-	<style type="text/css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no"/>
 
-	::selection { background-color: #f07746; color: #fff; }
-	::-moz-selection { background-color: #f07746; color: #fff; }
+    <link rel="icon" type="image/png" href="<?php echo $base_url.'assets/pg_admin/assets/img/favicon-16x16.png'; ?>" sizes="16x16">
+    <link rel="icon" type="image/png" href="<?php echo $base_url.'assets/pg_admin/assets/img/favicon-32x32.png'; ?>" sizes="32x32">
 
-	body {
-		background-color: #fff;
-		margin: 40px auto;
-		max-width: 1024px;
-		font: 16px/24px normal "Helvetica Neue", Helvetica, Arial, sans-serif;
-		color: #808080;
-	}
+    <title>Altair Admin v2.10.0 - 404 error</title>
 
-	a {
-		color: #dd4814;
-		background-color: transparent;
-		font-weight: normal;
-		text-decoration: none;
-	}
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500' rel='stylesheet' type='text/css'>
 
-	a:hover {
-		color: #97310e;
-	}
+    <!-- uikit -->
+    <link rel="stylesheet" href="<?php echo $base_url.'assets/pg_admin/bower_components/uikit/css/uikit.almost-flat.min.css'; ?>"/>
 
-	h1 {
-		color: #fff;
-		background-color: #dd4814;
-		border-bottom: 1px solid #d0d0d0;
-		font-size: 22px;
-		font-weight: bold;
-		margin: 0 0 14px 0;
-		padding: 5px 15px;
-		line-height: 40px;
-	}
+    <!-- altair admin error page -->
+    <link rel="stylesheet" href="<?php echo $base_url.'assets/pg_admin/assets/css/error_page.min.css'; ?>" />
 
-	h2 {
-		color:#404040;
-		margin:0;
-		padding:0 0 10px 0;
-	}
-
-	code {
-		font-family: Consolas, Monaco, Courier New, Courier, monospace;
-		font-size: 13px;
-		background-color: #f5f5f5;
-		border: 1px solid #e3e3e3;
-		border-radius: 4px;
-		color: #002166;
-		display: block;
-		margin: 14px 0 14px 0;
-		padding: 12px 10px 12px 10px;
-	}
-
-	#container {
-		margin: 10px;
-		border: 1px solid #d0d0d0;
-		box-shadow: 0 0 8px #d0d0d0;
-		border-radius: 4px;
-	}
-
-	p {
-		margin: 0 0 10px;
-		padding:0;
-	}
-
-	#body {
-		margin: 0 15px 0 15px;
-		min-height: 96px;
-	}
-	</style>
 </head>
-<body>
-	<div id="container">
-		<h1><?php echo $heading; ?></h1>
-		<div id="body">
-			<?php echo $message; ?>
-		</div>
-	</div>
+<body class="error_page">
+    <div class="error_page_header">
+        <div class="uk-width-8-10 uk-container-center">
+            <?php echo $heading; ?>
+        </div>
+    </div>
+      <div class="error_page_content">
+        <div class="uk-width-8-10 uk-container-center">
+            <p class="heading_b">Page not found</p>
+            <p class="uk-text-large">
+                <?php echo $message; ?>
+            </p>
+            <a href="#" onclick="history.go(-1);return false;">Go back to previous page</a>
+        </div>
+    </div>
 </body>
 </html>

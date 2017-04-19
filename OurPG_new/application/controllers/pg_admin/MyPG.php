@@ -30,7 +30,7 @@ class MyPG extends CI_Controller {
 	    $config = array();
 	    $config["base_url"] = base_url() . "/pg_admin/MyPG/details/";
             $config["total_rows"] = $this->pgadmin->record_count('my_pgs',array('pg_company_id'=>$company_dtl[0]['company_id']));
-            $config["per_page"] = 2;
+            $config["per_page"] = 10;
             $config["uri_segment"] = 4;
 	    $choice = $config["total_rows"] / $config["per_page"];
             $config["num_links"] = round($choice);
@@ -218,7 +218,7 @@ class MyPG extends CI_Controller {
                         );
                         $this->pgadmin->insert_info('user_profile',$data_user_profile);
                         // send verification email 
-                        if($this->sendverificationEmail($emp_email,$user_id_new,$ver_code)): // verification email sent sucessfully
+                        if($this->sendverificationEmail($emp_fname,$emp_email,$user_id_new,$ver_code)): // verification email sent sucessfully
                             $op['status']="success";
                             $op['msg'] = "Verification Mail Send Successfull to your Manager";                          
                             
@@ -237,7 +237,8 @@ class MyPG extends CI_Controller {
                             'emp_permanent_add'=>$emp_permanent_add,
                             'emp_present_add'=>$emp_present_add,
                             'role'=>$role,
-                            'user_id'=>$user_id,
+							'user_id'=>$user_id_new,
+                            'added_by'=>$user_id,
                             'company_id'=>$company_id
                             );
                             $data_array = array_filter($data_array); // filter array 
@@ -262,6 +263,7 @@ class MyPG extends CI_Controller {
                     'emp_permanent_add'=>$emp_permanent_add,
                     'emp_present_add'=>$emp_present_add,
                     'role'=>$role,
+                    'added_by'=>$user_id,
                     'company_id'=>$company_id
                     );
                 $data_array = array_filter($data_array); // filter array 
@@ -287,7 +289,7 @@ class MyPG extends CI_Controller {
             
         }
 	
-        function sendverificationEmail($email_to,$user_id,$code) {
+        function sendverificationEmail($emp_fname,$email_to,$user_id,$code) {
             // load encryption library
             
             $msg= "userid=".$user_id."&code=".$code;
@@ -316,19 +318,34 @@ class MyPG extends CI_Controller {
 			$config['charset'] = 'iso-8859-1';
 			$config['wordwrap'] = TRUE;
 
-            $this->email->initialize($config);
-            
-                $this->email->from(EMAIL_FROM, EMAIL_FROM_NAME);
-                $this->email->to($email_to);
-                $this->email->subject('Its verification '); 
-                $this->email->message('Its Verification Link <br/> <a href='.$verlink.'>'.$verlink.'</a>');
-			
-				$this->email->set_newline("\r\n");
-                if ($this->email->send()) {
-                    return TRUE;}
-                else {
-                    return FALSE;
-                }
+		$this->email->initialize($config);
+		$path = 'JSON_DATA/email/1005.json';
+		if(file_exists($path))
+                {
+			$json_file = file_get_contents($path);
+		       // convert the string to a json object
+		       $jfo = json_decode($json_file);
+		       
+		       $msg = str_replace(array("[PGMANAGER]","[VERIFICATION_LINK]","[BASEIMAGEURL]"), array($emp_fname,$verlink,asset_url()), $jfo->template->body_en); //  msg creation
+					 
+					 
+		       $this->email->from(EMAIL_FROM, EMAIL_FROM_NAME);
+		       $this->email->to($email_to);
+		       //$this->email->cc('email1@test.com,email2@test.com,email3@test.com');
+		       $this->email->subject($jfo->template->subject_en); 				  
+				       $this->email->message($msg);
+				       $this->email->set_newline("\r\n");
+		       if (!$this->email->send()) {
+			 show_error($this->email->print_debugger());
+			 return FALSE;
+			 }
+		       else {
+			return TRUE;
+       //                  echo 'Your e-mail has been sent!';
+		       }
+               }
+	      
+               
         }
         function generateCompanyID($company_id) {
             
@@ -365,11 +382,13 @@ class MyPG extends CI_Controller {
 			$emp_array =  array();
 			
 			// company pg employee mapping for checkbox
-			$company_pg_employee = $this->pgadmin->select_info('company_pg_employee',array('pg_company_id'=>$data['pgdata'][0]['pg_company_id']));
+			 $com_pg_emp = array();
+			$company_pg_employee = $this->pgadmin->select_info('company_pg_employee',array('pg_company_id'=>$data['pgdata'][0]['pg_company_id'],'my_pg_id'=>$id));
 			if(count($company_pg_employee) > 0 && $company_pg_employee != FALSE){
-			     $com_pg_emp = array();
+			    
 			     foreach ($company_pg_employee as $cpmkey => $cpmvalue) {
 				$com_pg_emp[] = $cpmvalue['emp_id'];
+				
 			     }
 			}
 			
@@ -402,7 +421,18 @@ class MyPG extends CI_Controller {
 	
 	public function editemployeedetail(){
 		
-		echo $emp_id = $this->input->post('id',true);	
+		$emp_id = $this->encrypt->decode($this->input->post('id'),VERI_KEY);
+		 $op = array();
+		if($emp_id):
+		     $pg_emp_details = $this->pgadmin->select_info('pg_employee',array('emp_id'=>$emp_id));
+		     $op['status']="success";
+		     $op['data'] = $pg_emp_details;
+		else:
+		    $op['status'] = "fail";
+                    $op['msg'] = "Something Went Wrong";
+                    
+		endif;
+		echo json_encode($op);
 	}
 	// Update page details
 	public function UpdateMyPg() {
@@ -459,7 +489,8 @@ class MyPG extends CI_Controller {
             if(isset($addpgemployee) && isset($mypg_id)):
 	    
 		// first of all Delete all data of pg and insert new record
-		$this->pgadmin->delete_info('company_pg_employee',array('pg_company_id'=>$company_id,'my_pg_id',$mypg_id));
+		$this->pgadmin->delete_info('company_pg_employee',array('pg_company_id'=>$company_id,'my_pg_id'=>$mypg_id));
+		
                 foreach ($addpgemployee as $key => $value) {
                    $emp_id = $this->encrypt->decode($value,VERI_KEY);
                    if(isset($emp_id)):
@@ -490,5 +521,32 @@ class MyPG extends CI_Controller {
 		
 		echo json_encode(array("success" => true)); 
 	}
-		
+	
+	public function updateemployeedetail(){
+	    $op = array();
+            $op['status'] = "";
+            $op['msg'] = "";
+            $user_id = $this->session->userdata('user_id');
+	    $emp_id = $this->input->post('emp_id',TRUE);     
+            $emp_aadhar_number =$this->input->post('emp_aadhar_number',TRUE);            
+            $emp_emg_no =$this->input->post('emp_emg_no',TRUE);
+            $emp_fname =$this->input->post('emp_fname',TRUE);
+            $emp_lname =$this->input->post('emp_lname',TRUE);
+            $emp_mobile =$this->input->post('emp_mobile',TRUE);
+            $emp_permanent_add =$this->input->post('emp_permanent_add',TRUE);
+            $emp_present_add =$this->input->post('emp_present_add',TRUE);
+           
+            $data_array = array(                    
+                    'emp_aadhar_number'=> $emp_aadhar_number,
+                    'emp_emg_no'=>$emp_emg_no,
+                    'emp_fname'=>$emp_fname,
+                    'emp_lname'=>$emp_lname,
+                    'emp_mobile'=>$emp_mobile,
+                    'emp_permanent_add'=>$emp_permanent_add,
+                    'emp_present_add'=>$emp_present_add,                   
+                    );
+            $this->pgadmin->update_info('pg_employee',$data_array,array('emp_id'=>$emp_id));
+	    $op['status']="success";
+            echo json_encode($op);
+	}
 }

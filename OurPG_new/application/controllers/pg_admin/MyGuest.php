@@ -17,6 +17,7 @@ class MyGuest extends CI_Controller {
             $data =  array();
             // check  for session  is available
             $user_id = $this->session->userdata('user_id');
+	    
             if(!isset($user_id)):
                 redirect('registration/pglogin');
                return TRUE; 
@@ -25,6 +26,8 @@ class MyGuest extends CI_Controller {
             $this->load->view('pg_admin/addguest');
         }
         public function sendNotification() {
+	    $company_dtl = $this->pgadmin->select_info('pg_company',array('user_id'=>$this->session->userdata('user_id')));	
+	    $company_id = $company_dtl[0]['company_id'];
             $op =  array();
             $guest_name = $this->input->post('guest_name');
             $guest_email = $this->input->post('guest_email');
@@ -33,17 +36,18 @@ class MyGuest extends CI_Controller {
             $info_array =  array();
             foreach ($guest_name as $key => $value) {
                 $info_array[$key]['pg_id']=1;
+		$info_array[$key]['company_id'] = $company_id;
                 $info_array[$key]['guest_name']=$value;
                 $info_array[$key]['guest_email']=$guest_email[$key];
                 $info_array[$key]['guest_mobile']=$guest_mobile[$key];
                 $info_array[$key]['guest_doj']= date('Y-m-d',strtotime(str_replace(".", "-", $guest_doj[$key])));
-                $info_array[$key]['entrycode']= rand(0,99999999);;
+                $info_array[$key]['entrycode']= rand(0,99999999);
+		$info_array[$key]['status']= 0;
             }
             
             $insert_info = $this->pgadmin->insert_batch_record('pg_invitation',$info_array);
-           // $this->sendEmailInvitation($info_array); //  send email invitation
-            $this->sendSMSInvitation($info_array); //  send email invitation
             $this->sendEmailInvitation($info_array); //  send email invitation
+            $this->sendSMSInvitation($info_array); //  send email invitation
             
             if($insert_info){
                 $op['status']="success";
@@ -58,7 +62,7 @@ class MyGuest extends CI_Controller {
             $username=SMS_UNAME;
             $password=SMS_PWD;            
             $sender=SMS_SENDER; 
-            $user_id = $this->session->userdata('user_id');
+            
             foreach ($info_array as $key => $value) {
                 $mobile_number=$value['guest_mobile'];
                 $message="Hello ".$value['guest_name']."\n"." Your PG Owner sent you invitation to complete your profile.\n Email:".$value['guest_email']." Ver Code: ".$value['entrycode'];
@@ -68,7 +72,7 @@ class MyGuest extends CI_Controller {
                 $responce_data = curl_exec($ch);
                 curl_close($ch);                 
                 $json = json_decode($responce_data, true);
-                
+                 $user_id = $this->session->userdata('user_id');
                 $sms_log[$key]['sender_uid'] = $user_id;
                 $sms_log[$key]['mobilenumbers'] = $json['mobilenumbers'];
                 $sms_log[$key]['refid'] = $json['refid'];
@@ -110,14 +114,24 @@ class MyGuest extends CI_Controller {
                 // link generation
             $msg= "entrycode=".$value['entrycode']."&email=".$value['guest_email'];            
             $encrypted_string = $this->encrypt->encode($msg, VERI_KEY);
-            $verlink = base_url()."registration/guestprofile?rand=".$encrypted_string;
+            $verlink = base_url()."guestregister/guest_verify?rand=".$encrypted_string;                
                 
-                
-                
+                $path = 'JSON_DATA/email/1003.json';
+		$email_msg = '';
+		if(file_exists($path))
+                {
+                   $json_file = file_get_contents($path);
+                   // convert the string to a json object
+                   $jfo = json_decode($json_file);
+                   $emailcode =  $jfo->template->email_code;
+                   $email_name  = $jfo->template->name_en;
+                   $email_subject =  $jfo->template->subject_en;                
+                   $email_msg = str_replace(array("[GUESTNAME]","[VERIFY_URL]"), array($value['guest_name'], $verlink ), $jfo->template->body_en);
+		}	
+		
                 $this->email->to($value['guest_email']);
                 $this->email->subject('Hi '.$value['guest_name']); 
-                $this->email->message('Please complete your profile details <br/> <a href='.$verlink.'>Complete profile</a>');
-			
+                $this->email->message($email_msg);			
                 $this->email->set_newline("\r\n");
                 $this->email->send() ;
                  

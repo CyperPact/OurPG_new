@@ -122,7 +122,7 @@
                                                </div>
                                                <div class="uk-width-medium-1-3">
                                                    
-                                                   <a  class="md-fab md-fab-small md-fab-accent uk-toggle"  data-uk-modal="{target:'#locationadder'}" ><i class="material-icons">location_on</i></a>
+                                                   <a  class="md-fab md-fab-small md-fab-accent uk-toggle" onclick="resize()"  data-uk-modal="{target:'#locationadder'}" ><i class="material-icons">location_on</i></a>
                                                    
                                                    <textarea class="md-input" id="locationaddress" readonly="">We detect your address</textarea>
                                                    <input type="hidden" name="latitude" id="latitude" />
@@ -189,7 +189,7 @@
 </div>
             <!-- model/-->
             <!-- location model -->
-            <div id="locationadder" class="uk-modal-container uk-modal">
+         <div id="locationadder" class="uk-modal-container uk-modal">
     <div class="uk-modal-dialog">
         <button class="uk-modal-close-default uk-close uk-modal-close" type="button" ></button>
         <div class="uk-modal-header">
@@ -292,7 +292,8 @@
 
 
             <!-- map scripts -->
-<script>     
+<script>
+	var map;
       function initMap(location,map) {		 
 	  if(location == null){		 
 		location = new google.maps.LatLng(20.5937,78.9629);			  
@@ -302,13 +303,13 @@
           zoom: 15,
           center: myLatlng
         });
-	var iconBase = 'https://maps.google.com/mapfiles/kml/pal3/';	  
-marker = new google.maps.Marker({
+			var iconBase = 'https://maps.google.com/mapfiles/kml/pal3/';	  
+			 marker = new google.maps.Marker({
           map: map,
           draggable: true,
           animation: google.maps.Animation.DROP,
           position: location,
-            icon: iconBase + 'icon48.png'
+          icon: iconBase + 'icon48.png'
         });
                 google.maps.event.addListener(marker, "dragend", function(event) { 
                 localStorage.setItem("lat",event.latLng.lat());
@@ -353,14 +354,18 @@ function toggleBounce() {
           }
         });
       }
+		
+		function resize(){
+			$('#submit').trigger('click');
+           
+		}
     </script>
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKJcDNduxmyXPS8pW-RJu8K7xJs6wbGMA&callback=initMap">
     </script>
             <!-- map scripts/ -->
             
-            <script>  
-                
+            <script>                  
                 // Add new employee Details 
                 $("#addemployeedetails").validate({
 						 errorElement: 'div',
@@ -429,10 +434,11 @@ function toggleBounce() {
                         data: $("#addemployeedetails").serialize(),
                         success: function(data) {
                             var data = JSON.parse(data);
-                            alert(data.status);
+                            //alert(data.status);
                             
                             if(data.status == "success")
-                            {                                   
+                            {
+										 UIkit.modal.alert(data.msg);
                               $('.alert_msg').html(data.msg);
                               UIkit.modal('#employeeadder').hide();
                               var html ="";
